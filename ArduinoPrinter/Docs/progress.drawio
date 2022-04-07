@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="sI4eSsxm3LsqCkz0lbyW" name="Page-1">
-        <mxGraphModel dx="948" dy="545" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="772" dy="545" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -37,6 +37,18 @@
                 </mxCell>
                 <mxCell id="37" style="edgeStyle=none;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.761;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="8" target="7">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" style="edgeStyle=none;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="8" target="42">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="380" y="577"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="44" value="Bon printen" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=#006600;" vertex="1" connectable="0" parent="43">
+                    <mxGeometry x="-0.008" y="-1" relative="1" as="geometry">
+                        <mxPoint x="19" y="12" as="offset"/>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="8" value="" style="aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image;image=img/lib/active_directory/laptop_client.svg;" vertex="1" parent="1">
                     <mxGeometry x="280" y="420.5" width="116.55" height="129.5" as="geometry"/>
@@ -80,16 +92,19 @@
                     <mxGeometry x="278.03999999999996" y="200" width="120.48" height="100" as="geometry"/>
                 </mxCell>
                 <mxCell id="38" value="Loginscherm&lt;br&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=#006600;" vertex="1" parent="1">
-                    <mxGeometry x="420" y="520.25" width="80" height="20" as="geometry"/>
+                    <mxGeometry x="420" y="353.25" width="80" height="20" as="geometry"/>
                 </mxCell>
                 <mxCell id="39" value="Saldoscherm" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=#006600;" vertex="1" parent="1">
-                    <mxGeometry x="415" y="540" width="90" height="20" as="geometry"/>
+                    <mxGeometry x="415" y="373" width="90" height="20" as="geometry"/>
                 </mxCell>
                 <mxCell id="40" value="Biljetkeuzescherm" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=#006600;" vertex="1" parent="1">
-                    <mxGeometry x="419" y="562" width="110" height="20" as="geometry"/>
+                    <mxGeometry x="419" y="395" width="110" height="20" as="geometry"/>
                 </mxCell>
                 <mxCell id="41" value="Snelpinscherm" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=#006600;" vertex="1" parent="1">
-                    <mxGeometry x="419" y="583" width="90" height="20" as="geometry"/>
+                    <mxGeometry x="419" y="416" width="90" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="" style="aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image;image=img/lib/active_directory/printer.svg;labelBackgroundColor=#006600;" vertex="1" parent="1">
+                    <mxGeometry x="550" y="550" width="83" height="54.78" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
