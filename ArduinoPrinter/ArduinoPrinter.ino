@@ -38,7 +38,7 @@ void setup() {
   printer.println(F("3 Maal is\nScheepsrecht\n"));
   
   //logo is super traag
-  //printer.printBitmap(adalogo_width, adalogo_height, adalogo_data);
+  printer.printBitmap(adalogo_width, adalogo_height, adalogo_data);
   printer.setSize('M');
   printer.println(F("OPNAME BILJETTEN\n"));
 
