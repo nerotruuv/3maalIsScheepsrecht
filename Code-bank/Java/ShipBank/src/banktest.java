@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
-
+import java.time.LocalDate;
 
 
 
@@ -21,9 +21,11 @@ public class banktest {
 
     private static final String withdraw_URL = "http://145.24.222.175:5000/withdraw";
     private static final String balance_URL = "http://145.24.222.175:5000/balance";
+    private static final String login_URL = "http://145.24.222.175:5000/login";
+
     private static HttpClient client = HttpClient.newHttpClient();
 
-    private static Arduino AdruinoCon = new Arduino("COM11", 9600);
+    private static Arduino AdruinoCon = new Arduino("COM5", 9600);
 
 
     private static void display_port()
@@ -40,16 +42,19 @@ public class banktest {
         Thread.sleep(2000);
         AdruinoCon.serialWrite(command);
     }
-    private static void sendLogCommand(int pin, int IBAN)throws Exception{
-        String commandToSend = "LOG," + Integer.toString(pin) + "," + Integer.toString(IBAN);
+    private static void sendLogCommand(int pin, String IBAN)throws Exception{
+        String commandToSend = ("LOG," + Integer.toString(pin) + "," + IBAN);
+        System.out.println("Send: " + commandToSend);
         sendCommand(commandToSend);
     }
     private static void sendEurCommand(int bil1, int bil2, int bil3)throws Exception{
-        String commandToSend = "EUR," + Integer.toString(bil1) + "," + Integer.toString(bil2) + "," + Integer.toString(bil3);
+        String commandToSend = ("EUR," + Integer.toString(bil1) + "," + Integer.toString(bil2) + "," + Integer.toString(bil3));
+        System.out.println("Send: " + commandToSend);
         sendCommand(commandToSend);
     }
-    private static void sendBonCommand(int total, int IBAN)throws Exception{
-        String commandToSend = "BAN," + Integer.toString(total) + "," + Integer.toString(IBAN);
+    private static void sendBonCommand(int total, String IBAN)throws Exception{
+        String commandToSend = ("BAN," + Integer.toString(total) + "," + IBAN);
+        System.out.println("Send: " + commandToSend);
         sendCommand(commandToSend);
     }
 
@@ -66,7 +71,9 @@ public class banktest {
 
         return response.body();
     }
+    
     private static String postWithdraw(String inputs) throws Exception{
+
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(withdraw_URL+inputs))
@@ -79,6 +86,24 @@ public class banktest {
 
         return response.body();
     }
+    
+    private static String postLogin(String inputs) throws Exception{
+        HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(withdraw_URL+inputs))
+        .POST(HttpRequest.BodyPublishers.noBody())
+        .build();
+
+        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+        return response.body();
+    }
+    //niet af kon nog niet testen
+    private static int parseLogin(String jsonString){
+        JSONObject obj = new JSONObject(jsonString);
+        String n = obj.getString("message");
+        String res[] = n.substring(2).split(",");
+        return Integer.parseInt(res[0]);
+    }
+
     private static int parseBalance(String jsonString){
         JSONObject obj = new JSONObject(jsonString);
         String n = obj.getString("message");
@@ -86,10 +111,31 @@ public class banktest {
         return Integer.parseInt(res[0]);
     }
 
+    private static void readSerial() throws Exception {
+        String inputString = AdruinoCon.serialRead(); 
+        String inputSplit[] = inputString.substring(0).split(",");
+        //hier kunnen terug gestuurde commandos verwerkt worden
+        if(inputSplit[0] == "PIN"){
+            //hier moet de code om de login ter verifieren of om terug te reageren
+        }
+    }
+
+
     public static void main(String[] args) throws Exception {
-        //display_port();
-        sendCommand("70-2-3-4-0982");
-        System.out.println("send");   
+        if(AdruinoCon.openConnection()){
+            sendBonCommand(50, "NL76RABO0354400312");    
+        }
+        //dit stukje is om de response van arduino te ontvangen, als test
+        // while(true){
+        //     String inputString = AdruinoCon.serialRead();
+            
+        //     String inputSplit[] = inputString.substring(0).split(",");
+
+        //     if(inputString != ""){
+        //         System.out.println(inputString);
+        //         break;
+        //     }
+        // }  
     }   
 }
 
