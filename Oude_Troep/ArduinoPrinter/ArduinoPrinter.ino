@@ -16,22 +16,15 @@
 // If using hardware serial instead, comment out or remove these lines:
 
 #include "SoftwareSerial.h"
-#define TX_PIN 6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
-#define RX_PIN 5 // Arduino receive   GREEN WIRE   labeled TX on printer
+#define TX_PIN A3 // Arduino transmit  YELLOW WIRE  labeled RX on printer
+#define RX_PIN A4// Arduino receive   GREEN WIRE   labeled TX on printer
 
 SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
 char strbuf[30];
 
-void setup() {
-
-  pinMode(7, OUTPUT); digitalWrite(7, LOW);
-  mySerial.begin(9600);  // Initialize SoftwareSerial
-  printer.begin();        // Init printer (same regardless of serial type)
-
-
- 
+void printBon(int bedrag, int pasNr, int saldo){
   //header
   printer.justify('C');
   printer.setSize('L'); 
@@ -49,9 +42,9 @@ void setup() {
   printer.println(F("23-03-22\t13:37\n"));
 
   //pinfo 
-  sprintf(strbuf, "PAS NUMMER\t\t: *****%d",1234);
+  sprintf(strbuf, "PAS NUMMER\t\t: *****%d",pasNr);
   printer.println(strbuf);
-  sprintf(strbuf, "BEDRAG\t\t\t: EUR %d,00",70);
+  sprintf(strbuf, "BEDRAG\t\t\t: EUR %d,00",bedrag);
   printer.println(strbuf);
   
   printer.justify('C');
@@ -66,5 +59,15 @@ void setup() {
   printer.setDefault(); // Restore printer to defaults
 }
 
+
+void setup() {
+
+  pinMode(7, OUTPUT); digitalWrite(7, LOW);
+  mySerial.begin(9600);  // Initialize SoftwareSerial
+  printer.begin();        // Init printer (same regardless of serial type)
+  printBon(70,1234,750);
+}
+
 void loop() {
+  
 }

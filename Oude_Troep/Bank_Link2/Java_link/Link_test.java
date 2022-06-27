@@ -1,6 +1,8 @@
+package Bank_Link2.Java_link;
+
 import com.fazecast.jSerialComm.*;
 import com.mysql.cj.xdevapi.Client;
-
+import org.json.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,11 +13,60 @@ import java.util.Scanner;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandler;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.net.URI;
 
 
+
 public class Link_test {
+
+
+    public static String postBalance(String inputs) throws Exception{
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(balance_URL+inputs))
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .build();
+
+        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        System.out.println(response.body());
+
+        return response.body();
+    }
+
+    public static String postWithdraw(String inputs) throws Exception{
+
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(withdraw_URL+inputs))
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .build();
+
+        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        System.out.println(response.body());
+
+        return response.body();
+    }
+
+    public static int parseBalance(String jsonString){
+        JSONObject obj = new JSONObject(jsonString);
+        String n = obj.getString("message");
+        String res[] = n.substring(2).split(",");
+        return Integer.parseInt(res[0]);
+    }
+
+    private static final String withdraw_URL = "http://145.24.222.175:5000/withdraw";
+    private static final String balance_URL = "http://145.24.222.175:5000/balance";
+    private static HttpClient client = HttpClient.newHttpClient();
+
+
+
+
     static String ten = "abc";
     static String twenty = "abc";
     static String fifty = "abc";
@@ -44,8 +95,25 @@ public class Link_test {
     static JButton button4_7 = new JButton("[7] 100 EUR");
     static JButton button4_8 = new JButton("[A] Terug");
     static JButton button4_9 = new JButton("[9] Ander bedrag invoeren");
+  
+    
+    public static String getBalance(String iban){ //"/CH33SHIP0354400312"
+        String temp1 = "", temp2 = "";
 
-    static JButton button5_1 = new JButton("'Saldo'");
+        try {
+            temp1 = postBalance(iban);
+            temp2 = String.valueOf(parseBalance(temp1));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp2;
+    }
+
+
+        
+
+    
+    static JButton button5_1 = new JButton(); // show de balance
     static JButton button5_2 = new JButton("[A] Terug                                [B] Afsluiten");
 
     static JButton button6_1 = new JButton("Uw geld komt eraan.");
@@ -58,6 +126,14 @@ public class Link_test {
     static JButton button9_1 = new JButton("Weet u het zeker?");
     static JButton button9_2 = new JButton("[A] Ja                                [B] Nee");
 
+    static JButton button10_1 = new JButton("Wilt u de bon?");
+    static JButton button10_2 = new JButton("[A] Ja                                [B] Nee");
+
+    static JButton button11_1 = new JButton("Voer uw gewenst bedrag in");
+    static JButton button11_2 = new JButton("");
+    static JButton button11_3 = new JButton("[#] Verder");
+
+
     static JPanel panelCont = new JPanel();
     static JPanel panel1 = new JPanel(new GridLayout(1, 1));
     static JPanel panel2 = new JPanel(new GridLayout(3, 1));
@@ -67,8 +143,11 @@ public class Link_test {
     static JPanel panel5 = new JPanel(new GridLayout(2, 1));
     static JPanel panel6 = new JPanel(new GridLayout(1, 1));
     static JPanel panel7 = new JPanel(new GridLayout(2, 1));
-    static JPanel panel8 = new JPanel(new GridLayout(2, 1));
+    static JPanel panel8 = new JPanel(new GridLayout(1, 1));
     static JPanel panel9 = new JPanel(new GridLayout(2, 1));
+    static JPanel panel10 = new JPanel(new GridLayout(2,1));
+    static JPanel panel11 = new JPanel(new GridLayout(3, 1));
+
 
     static CardLayout cl = new CardLayout();
 
@@ -83,30 +162,6 @@ public class Link_test {
     public static boolean print = false;
 
     
-
-    public void request(String uri) throws Exception {
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(uri))
-            .build();
-    
-        HttpResponse<String> response =
-                client.send(request, BodyHandler.asString());
-    
-        System.out.println(response.body());
-    }
-
-    public void withdrawURL(String account, int amount){
-        
-        request()
-    }
-
-    public void balanceURL(String account){
-        
-        request()
-    }
-
 
 
     public static void main(String[] args) throws Exception {
@@ -194,6 +249,21 @@ public class Link_test {
         button9_2.setFont(arial40);
         button9_2.setBackground(Color.DARK_GRAY);
         button9_2.setForeground(Color.WHITE);
+        button10_1.setFont(arial40);
+        button10_1.setBackground(Color.DARK_GRAY);
+        button10_1.setForeground(Color.WHITE);
+        button10_2.setFont(arial40);
+        button10_2.setBackground(Color.DARK_GRAY);
+        button10_2.setForeground(Color.WHITE);
+        button11_1.setFont(arial40);
+        button11_1.setBackground(Color.DARK_GRAY);
+        button11_1.setForeground(Color.WHITE);
+        button11_2.setFont(arial40);
+        button11_2.setBackground(Color.DARK_GRAY);
+        button11_2.setForeground(Color.WHITE);
+        button11_3.setFont(arial40);
+        button11_3.setBackground(Color.DARK_GRAY);
+        button11_3.setForeground(Color.WHITE);
 
         panel1.add(button1);
 
@@ -229,6 +299,13 @@ public class Link_test {
         panel9.add(button9_1);
         panel9.add(button9_2);
 
+        panel10.add(button10_1);
+        panel10.add(button10_2);
+
+        panel11.add(button11_1);
+        panel11.add(button11_2);
+        panel11.add(button11_3);
+
         panelCont.add(panel1, "1");
         panelCont.add(panel2, "2");
         panelCont.add(panel3, "3");
@@ -238,6 +315,9 @@ public class Link_test {
         panelCont.add(panel7, "7");
         panelCont.add(panel8, "8");
         panelCont.add(panel9, "9");
+        panelCont.add(panel10, "10");
+        panelCont.add(panel11, "11");
+
         cl.show(panelCont, "1");
 
         frame.add(panelCont);
@@ -247,7 +327,7 @@ public class Link_test {
         frame.setSize(1280, 720); // UI window size (create in the main)
         frame.setVisible(true); // set the UI visible (can also be into the void serialEvent)
 
-        SerialPort port = SerialPort.getCommPort("COM4");
+        SerialPort port = SerialPort.getCommPort("COM11");
         port.setComPortParameters(9600, 8, 1, 0);
         port.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
         System.out.println("Open port: " + port.openPort());
@@ -275,6 +355,8 @@ public class Link_test {
 
                 System.out.println("return: " + input);
                 received = true;
+
+
 
                 if (input.contains("access")) {
                     p = 2;
@@ -309,7 +391,11 @@ public class Link_test {
                 }
 
                 if (input.contains("Ander bedrag invoeren")) {
-                    p = 7;
+                    p = 11;
+                }
+
+                if (input.contains("bonprinten")) {
+                    p = 10;
                 }
 
                 if (input.contains("Terug 3")) {
@@ -333,10 +419,19 @@ public class Link_test {
                     p = 1;
                     button1.setText("Scan uw kaart");
                 }
-                if (input.contains("Ja 9")) {
+                if (input.contains("Ja 9")) {                   // withdraw  snel pinnen was 70eu -- data komt uit de terminal binnen 
                     p = 6;
                 }
                 if (input.contains("Nee 9")) {
+                    p = 3;
+                }
+                if (input.contains("Ja 10")) {
+                    p = 3;
+                }
+                if (input.contains("Nee 10")) {
+                    p = 3;
+                }
+                if (input.contains("Terug 11")){
                     p = 3;
                 }
 
@@ -418,6 +513,12 @@ public class Link_test {
                         break;
                     case 9:
                         cl.show(panelCont, "9");
+                        break;
+                    case 10:
+                        cl.show(panelCont, "10");
+                        break;
+                    case 11:
+                        cl.show(panelCont, "11");
                         break;
                 }
 

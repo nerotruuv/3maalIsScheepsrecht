@@ -1,3 +1,5 @@
+package Bank_Link2.Java_link;
+
 import com.fazecast.jSerialComm.SerialPort;
 
 /**
@@ -13,7 +15,7 @@ public class Startup implements Runnable {
     public void run() {
         try {
 
-        SerialPort sp = SerialPort.getCommPort("COM1");
+        SerialPort sp = SerialPort.getCommPort("COM13");
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 

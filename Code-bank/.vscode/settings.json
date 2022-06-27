@@ -1,0 +1,9 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "Java/ShipBank/lib/arduino.jar",
+        "Java/ShipBank/lib/jSerialComm-1.3.11.jar",
+        "Java/ShipBank/lib/json-20220320.jar",
+        "Java/ShipBank/lib/mysql-connector-java-8.0.24.jar"
+    ]
+}

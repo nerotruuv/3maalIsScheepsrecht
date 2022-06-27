@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>NOOB Public Log</title>
+    </head>
+
+    <body>
+        <div id="table"></div>
+
+        <script type="text/javascript">
+             var opts = {
+                 url: 'http://localhost:8080/'
+             };
+
+             fetch(opts)
+                 .then((res) => {
+                     if (res.ok) {
+                         return res.json();
+                     }
+                  })
+                  .then((rows) => {
+                      for (let row of rows) {
+                          console.log("time: "+row.time+", message: "+row.message);
+                      }
+                   })
+                   .catch(console.log);
+        </script>
+    </body> 
+</html>
