@@ -1,5 +1,3 @@
-
-
 import com.fazecast.jSerialComm.*;
 import com.mysql.cj.xdevapi.Client;
 import org.json.*;

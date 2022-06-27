@@ -11,8 +11,8 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-enum functie getFunction(String sub){
-  enum functie funct;
+void getFunction(String sub){
+
   String temp = sub.substring(0,2);
   switch(temp){
     case "LOG":

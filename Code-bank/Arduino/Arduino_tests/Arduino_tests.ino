@@ -1,7 +1,5 @@
+#include "sunk.h"
 #include "StringSplitter.h"
-
-//LOG, EUR, BON
-enum {login, cashout, receipt}functie;
 
 String readString = "";
 String inputArray[5];
@@ -11,31 +9,9 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-enum functie getFunction(String sub){
-  enum functie funct;
-  String temp = sub.substring(0,2);
-  switch(temp){
-    case "LOG":
-      funct = login;
-      return funct;
-      break;
-    case "EUR":
-      funct = cashout;
-      return funct;
-      break;
-    case "BON":
-      funct = receipt;
-      return funct;
-      break;
-   default:
-     Serial.println("binnengekomen functie komt niet overeen");
-     break;
-  }
-  return temp.toInt();
-}
 
 //input even nog binnenhalen ergens
-void checkLogin(int input, int pin){
+void checkLogin(int pin, String IBAN){
   
 }
 
@@ -45,41 +21,40 @@ void printCash(int bil1, int bil2, int bil3){
 }
 
 //verweizing naar de bonprint functie
-void printReceipt(int total, String iban){
+void printReceipt(int total, String IBAN){
   
 }
 
 
 void functieParser(String input){
-  functie = getFunction(input);
+  String function = input.substring(0,2);
   StringSplitter *splitter;
-  switch(functie){
-    // LOG, PIN, IBAN
-    case login:
-      splitter = new StringSplitter(readString, ',', 3);
-      int pin = splitter->getItemAtIndex(1).toInt();
-      //checklogin(input, pin);
-      break;
+  // LOG, PIN, IBAN
+  if(function.equals("LOG")){
+    splitter = new StringSplitter(readString, ',', 3);
+    int pin = splitter->getItemAtIndex(1).toInt();
+    String IBAN = splitter->getItemAtIndex(2);
+    checkLogin(pin, IBAN);
 
-    // EUR, BIL1, BIL2, BIL3
-    case cashout:
-      splitter = new StringSplitter(readString, ',', 4);
-      int BIL1 = splitter->getItemAtIndex(1).toInt();
-      int BIL2 = splitter->getItemAtIndex(2).toInt();
-      int BIL3 = splitter->getItemAtIndex(3).toInt();
-      printCash(BIL1, BIL2, BIL3);
-      break;
+  // EUR, BIL1, BIL2, BIL3
+  }else if(function.equals("EUR")){
+    splitter = new StringSplitter(readString, ',', 4);
+    int BIL1 = splitter->getItemAtIndex(1).toInt();
+    int BIL2 = splitter->getItemAtIndex(2).toInt();
+    int BIL3 = splitter->getItemAtIndex(3).toInt();
+    printCash(BIL1, BIL2, BIL3);
 
-    // BON, TOTAL, IBAN
-    case receipt:
-      splitter = new StringSplitter(readString, ',', 3);
-      
-      break;
-      
-    default:
-      Serial.println("binnengekomen functie komt niet overeen");
-      break
-  }
+  // BON, TOTAL, IBAN
+  }else if(function.equals("BON")){
+    splitter = new StringSplitter(readString, ',', 3);
+    int total = splitter->getItemAtIndex(1).toInt();
+    String IBAN = splitter->getItemAtIndex(2);
+    printReceipt(total, IBAN);
+  
+  }else{
+    Serial.println("binnengekomen functie komt niet overeen");
+  } 
+  
 }
 
 void loop() {
@@ -91,16 +66,13 @@ void loop() {
   }
   
   if (readString.length() >0) {
-    //split de string in een stringsplitter
-    //StringSplitter *splitter = new StringSplitter(readString, '-', 5);
-    // pinbedrag, biljet1, biljet2, biljet3, 4 cijfers accountnummer
-    
-    String item = splitter->getItemAtIndex(4); //pak het 4e element van verzonde bericht
-    if(item == "0982"){
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(1000);                       // wait for a second
-      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-      delay(1000); 
-    }
+    functieParser(readString);    
   }
 }
+
+//    String item = splitter->getItemAtIndex(4); //pak het 4e element van verzonde bericht
+//    if(item == "0982"){
+//      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//      delay(1000);                       // wait for a second
+//      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//      delay(1000); 

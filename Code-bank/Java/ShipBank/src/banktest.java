@@ -25,10 +25,32 @@ public class banktest {
 
     private static Arduino AdruinoCon = new Arduino("COM11", 9600);
 
+
+    private static void display_port()
+    {
+        SerialPort[] ports = SerialPort.getCommPorts();
+        for (int i = 0; i < ports.length; i++) 
+        {
+        System.out.println(ports[i].getSystemPortName());
+        }
+    }
+
     private static void sendCommand(String command) throws InterruptedException {
         AdruinoCon.openConnection();    
         Thread.sleep(2000);
         AdruinoCon.serialWrite(command);
+    }
+    private static void sendLogCommand(int pin, int IBAN)throws Exception{
+        String commandToSend = "LOG," + Integer.toString(pin) + "," + Integer.toString(IBAN);
+        sendCommand(commandToSend);
+    }
+    private static void sendEurCommand(int bil1, int bil2, int bil3)throws Exception{
+        String commandToSend = "EUR," + Integer.toString(bil1) + "," + Integer.toString(bil2) + "," + Integer.toString(bil3);
+        sendCommand(commandToSend);
+    }
+    private static void sendBonCommand(int total, int IBAN)throws Exception{
+        String commandToSend = "BAN," + Integer.toString(total) + "," + Integer.toString(IBAN);
+        sendCommand(commandToSend);
     }
 
     private static String postBalance(String inputs) throws Exception{
@@ -44,7 +66,6 @@ public class banktest {
 
         return response.body();
     }
-
     private static String postWithdraw(String inputs) throws Exception{
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -58,7 +79,6 @@ public class banktest {
 
         return response.body();
     }
-
     private static int parseBalance(String jsonString){
         JSONObject obj = new JSONObject(jsonString);
         String n = obj.getString("message");
@@ -66,89 +86,11 @@ public class banktest {
         return Integer.parseInt(res[0]);
     }
 
-    private static void display_port()
-    {
-        SerialPort[] ports = SerialPort.getCommPorts();
-        for (int i = 0; i < ports.length; i++) 
-        {
-        System.out.println(ports[i].getSystemPortName());
-        }
-    }
-
-
-
-    public static void OutputStreamByteSubSequence(String com, String data) throws Exception {
-        byte[] bytes = data.getBytes();
-        System.out.println(bytes.length);
-        SerialPort port = SerialPort.getCommPort(com);
-        port.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
-        port.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
-
-        if (port.openPort()){
-            System.out.println("Port is open");
-        }else{
-            System.out.println("Failed to open port");
-            return;
-        }
-
-        PrintWriter output = new PrintWriter(port.getOutputStream());
-        output.print(data);
-        output.flush();
-        
-        if (port.closePort()){
-            System.out.println("Port is closed");
-        }else{
-            System.out.println("Failed to close port");
-            return; 
-        }
-
-    }
-
     public static void main(String[] args) throws Exception {
         //display_port();
         sendCommand("70-2-3-4-0982");
-        System.out.println("send");
-
-        //OutputStreamByteSubSequence("COM11", "on");    
+        System.out.println("send");   
     }   
 }
 
-    // Thread thread = new Thread(){
-    //     @Override public void run(){
-    //         try {Thread sleep(100); } catch(Exception e){}
-    //         PrintWriter output = new PrintWriter(port.getOutputStream());
-    //         while(true){
-    //             output.print("Hello");
-    //             output.flush();
-    //         }
-    //     }
-    // }
-    // thread.start();
-
-            // public static void OutputStreamByteSubSequence(String com, String data) throws Exception {
-    //     byte[] bytes = data.getBytes();
-    //     System.out.println(bytes.length);
-    //     SerialPort port = SerialPort.getCommPort(com);
-    //     port.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
-    //     port.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 10000, 10000);
-
-    //     if (port.openPort()){
-    //         System.out.println("Port is open");
-    //     }else{
-    //         System.out.println("Failed to open port");
-    //         return;
-    //     }
-
-    //     for(int i = 0; i < bytes.length; i++){
-    //         port.getOutputStream().write(bytes[i]);
-    //         port.getOutputStream().flush();
-    //         Thread.sleep(500);
-    //     }
-
-    //     if (port.closePort()){
-    //         System.out.println("Port is closed");
-    //     }else{
-    //         System.out.println("Failed to close port");
-    //         return; 
-    //     }
-    // }
+ 
