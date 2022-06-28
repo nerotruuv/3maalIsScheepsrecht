@@ -27,7 +27,6 @@ public class banktest {
 
     private static Arduino AdruinoCon = new Arduino("COM5", 9600);
 
-
     private static void display_port()
     {
         SerialPort[] ports = SerialPort.getCommPorts();
@@ -42,8 +41,10 @@ public class banktest {
         Thread.sleep(2000);
         AdruinoCon.serialWrite(command);
     }
-    private static void sendLogCommand(int pin, String IBAN)throws Exception{
-        String commandToSend = ("LOG," + Integer.toString(pin) + "," + IBAN);
+    //LOG,JA?NEE
+    private static void sendLogCommand(int result)throws Exception{
+
+        String commandToSend = ("LOG," + Integer.toString(result));
         System.out.println("Send: " + commandToSend);
         sendCommand(commandToSend);
     }
@@ -58,8 +59,9 @@ public class banktest {
         sendCommand(commandToSend);
     }
 
-    private static String postBalance(String inputs) throws Exception{
+    private static String postBalance(String IBAN) throws Exception{
 
+        String inputs = ("/" + IBAN);
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(balance_URL+inputs))
             .POST(HttpRequest.BodyPublishers.noBody())
@@ -72,9 +74,9 @@ public class banktest {
         return response.body();
     }
     
-    private static String postWithdraw(String inputs) throws Exception{
+    private static String postWithdraw(String IBAN, int amount) throws Exception{
 
-
+        String inputs = ("/" + IBAN + "/" + Integer.toString(amount));
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(withdraw_URL+inputs))
             .POST(HttpRequest.BodyPublishers.noBody())
@@ -87,15 +89,18 @@ public class banktest {
         return response.body();
     }
     
-    private static String postLogin(String inputs) throws Exception{
+    private static int postLogin(String IBAN, int PIN) throws Exception{
+
+        String inputs = ("/" + IBAN + "/" + Integer.toString(PIN));
         HttpRequest request = HttpRequest.newBuilder()
         .uri(URI.create(withdraw_URL+inputs))
         .POST(HttpRequest.BodyPublishers.noBody())
         .build();
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-        return response.body();
+        return response.statusCode();
     }
+    
     //niet af kon nog niet testen
     private static int parseLogin(String jsonString){
         JSONObject obj = new JSONObject(jsonString);
@@ -117,14 +122,25 @@ public class banktest {
         //hier kunnen terug gestuurde commandos verwerkt worden
         if(inputSplit[0] == "PIN"){
             //hier moet de code om de login ter verifieren of om terug te reageren
+            int response = postLogin(inputSplit[1], Integer.parseInt(inputSplit[2]));
+            
+            if(response == 403){ // geblokkeerd
+                System.out.print("get cucked");
+            }else if(response == 401){// verkeerde pin
+                System.out.println("verkeerde pin");
+                sendLogCommand(0);
+            }else if(response == 200){
+                System.out.println("Pin succesvol");
+                sendLogCommand(1);
+            }
         }
     }
-
 
     public static void main(String[] args) throws Exception {
         if(AdruinoCon.openConnection()){
             sendBonCommand(50, "NL76RABO0354400312");    
         }
+
         //dit stukje is om de response van arduino te ontvangen, als test
         // while(true){
         //     String inputString = AdruinoCon.serialRead();
