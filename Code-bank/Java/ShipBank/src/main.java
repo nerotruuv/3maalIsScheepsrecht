@@ -44,8 +44,6 @@ public class main {
         System.out.println("Send: " + commandToSend);
         sendCommand(commandToSend);
     }
-
-
     // maak nog een functie voor het uivoglen van de benodigde 70 euro biljette
     private static void sendEurCommand(int bil1, int bil2, int bil3)throws Exception{
         String commandToSend = ("EUR," + Integer.toString(bil1) + "," + Integer.toString(bil2) + "," + Integer.toString(bil3));
@@ -116,6 +114,23 @@ public class main {
         return Integer.parseInt(res[0]);
     }
 
+
+
+    private static void newLogin(HttpResponse response) throws Exception {
+        if(response.statusCode() == 403){ // geblokkeerd
+            System.out.print("get cucked");
+        }else if(response.statusCode() == 401){// verkeerde pin
+            System.out.println("verkeerde pin");
+            sendLogCommand(0);
+        }else if(response.statusCode() == 200){
+            System.out.println("Pin succesvol");
+            sendLogCommand(1);
+        }
+    }
+
+
+
+
     /*
      * This is the serial interpreter, it receives the incomming information and interpretes it
      * to figure out which funtion the seponse is meant for
@@ -126,21 +141,20 @@ public class main {
         //hier kunnen terug gestuurde commandos verwerkt worden
         if(inputSplit[0] == "PIN"){
             //hier moet de code om de login ter verifieren of om terug te reageren
-            // postlogin, iban, pin
+            // postlogin, iban, pin            
             HttpResponse response = postLogin(inputSplit[1], Integer.parseInt(inputSplit[2]));
+            newLogin(response);
+        
+        //menu navigatie
+        }
+        else if(inputSplit[0] == "NAV"){
             
-            if(response.statusCode() == 403){ // geblokkeerd
-                System.out.print("get cucked");
-            }else if(response.statusCode() == 401){// verkeerde pin
-                System.out.println("verkeerde pin");
-                sendLogCommand(0);
-            }else if(response.statusCode() == 200){
-                System.out.println("Pin succesvol");
-                sendLogCommand(1);
-            }
+        }
+        else if(inputSplit[0] == "MON"){
+
         }
     }
-
+    
 
 
     /*
@@ -152,10 +166,11 @@ public class main {
     * is an example of sending the information for printing to the arduino 
     */
 
-
-
     /*
      * send out command to get pin and iban info -> receive info
+     * check for iban to determine the databse to check against
+     *  -> not ours, forward with all neccecery info to landserver
+     *  -> continue
      * check info against database  -> 401 go again, wrong pin
      *                              -> 403 pas blocked, ftfu
      *                              -> 200 continue to next menu
@@ -187,11 +202,8 @@ public class main {
          * this seperates all the single values seperated on every, 
          */
         while(true){
-            String inputString = AdruinoCon.serialRead();    
-            String inputSplit[] = inputString.substring(0).split(",");
-            
-            
-
+           
+            readSerial();
 
         }
     } 
