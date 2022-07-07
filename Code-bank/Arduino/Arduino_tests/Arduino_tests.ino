@@ -25,6 +25,13 @@ String readString = "";
 String inputArray[5];
 char strbuf[30];
 
+enum menu
+{
+  pin = 1,
+  main = 2
+};
+enum menu current_menu;
+
 const byte ROWS = 4;
 const byte COLS = 4;
 char hexaKeys[ROWS][COLS] = {
@@ -33,6 +40,7 @@ char hexaKeys[ROWS][COLS] = {
   {'7', '8', '9', 'C'},
   {'*', '0', '#', 'D'}
 };
+
 byte rowPins[ROWS] = {8, 7, 6, 5};
 byte colPins[COLS] = {4, 3, 2, A5};
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -171,21 +179,27 @@ void checkLogin(){
 
 
 void loop() {
-  // check of er een nieuwe pas is die inlogt
-  if( ! mfrc522.PICC_ReadCardSerial()){
-    return;
-  }
-  if ( ! mfrc522.PICC_IsNewCardPresent()) {
-    return;
-  }
-  // als er een pas is gedetecteerd die niet hetzelfde is als de oude pas, dan kan het door naar de juice
-  else{
-    while(inProcess){
-      Serial.print("NAV,LOG"); // naar het login scherm navigeren
-      checkLogin();
-    }
-  }
+  Serial.print("PIN,1234,NL76RABO0354400312");
+  delay(2000);
 }
+
+  
+//  // check of er een nieuwe pas is die inlogt
+//  if( ! mfrc522.PICC_ReadCardSerial()){
+//    return;
+//  }
+//  if ( ! mfrc522.PICC_IsNewCardPresent()) {
+//    return;
+//  }
+//  // als er een pas is gedetecteerd die niet hetzelfde is als de oude pas, dan kan het door naar de juice
+//  else{
+//    while(true){
+//      switch(
+//        Serial.print("NAV,LOG"); // naar het login scherm navigeren
+//        //checkLogin();
+//    }
+//  }
+
 
 
 

@@ -3,6 +3,7 @@ import arduino.Arduino;
 import org.json.*;
 
 import javax.swing.*;
+import java.awt.*;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -19,13 +20,247 @@ import java.time.LocalDate;
 
 
 public class main {
+
+    /*
+    * alle gui declaraties
+    */
+    static String saldo = "something";
+
+    static JFrame frame = new JFrame("My First GUI"); // UI window creation
+    static JButton button1 = new JButton("Scan uw kaart");
+
+    static JButton button2_1 = new JButton("");
+    static JButton button2_2 = new JButton("[#] Verder");
+    static JButton button2_3 = new JButton("[*] Annuleren");
+
+    static JButton button3_1 = new JButton("[1] Snel 70 EUR pinnen");
+    static JButton button3_2 = new JButton("[2]Ander bedrag pinnen");
+    static JButton button3_3 = new JButton("[3]Saldo bekijken");
+    static JButton button3_4 = new JButton("[B] Afsluiten");
+
+    static JButton button4_1 = new JButton("[1] 20 EUR");
+    static JButton button4_2 = new JButton("");
+    static JButton button4_3 = new JButton("[3] 200 EUR");
+    static JButton button4_4 = new JButton("[4] 50 EUR");
+    static JButton button4_5 = new JButton("");
+    static JButton button4_6 = new JButton("[6] 300 EUR");
+    static JButton button4_7 = new JButton("[7] 100 EUR");
+    static JButton button4_8 = new JButton("[A] Terug");
+    static JButton button4_9 = new JButton("[9] Ander bedrag invoeren");
+
+    static JButton button5_1 = new JButton(saldo); // show de balance
+    static JButton button5_2 = new JButton("[A] Terug                                [B] Afsluiten");
+
+    static JButton button6_1 = new JButton("Uw geld komt eraan.");
+
+    static JButton button7_1 = new JButton("Wilt u terug naar hoofdmenu of afsluiten?");
+    static JButton button7_2 = new JButton("[A] Terug                                [B] Afsluiten");
+
+    static JButton button8_1 = new JButton("[*] Fijne dag!");
+
+    static JButton button9_1 = new JButton("Weet u het zeker?");
+    static JButton button9_2 = new JButton("[A] Ja                                [B] Nee");
+
+    static JButton button10_1 = new JButton("Wilt u de bon?");
+    static JButton button10_2 = new JButton("[A] Ja                                [B] Nee");
+
+    static JButton button11_1 = new JButton("Voer uw gewenste bedrag in");
+    static JButton button11_2 = new JButton("");
+    static JButton button11_3 = new JButton("[#] Verder");
+
+    static JPanel panelCont = new JPanel();
+    static JPanel panel1 = new JPanel(new GridLayout(1, 1));
+    static JPanel panel2 = new JPanel(new GridLayout(3, 1));
+    static JPanel panel3 = new JPanel(new GridLayout(2, 2));
+
+    static JPanel panel4 = new JPanel(new GridLayout(3, 2));
+    static JPanel panel5 = new JPanel(new GridLayout(2, 1));
+    static JPanel panel6 = new JPanel(new GridLayout(1, 1));
+    static JPanel panel7 = new JPanel(new GridLayout(2, 1));
+    static JPanel panel8 = new JPanel(new GridLayout(1, 1));
+    static JPanel panel9 = new JPanel(new GridLayout(2, 1));
+    static JPanel panel10 = new JPanel(new GridLayout(2, 1));
+    static JPanel panel11 = new JPanel(new GridLayout(3, 1));
+
+    static CardLayout cl = new CardLayout();
+
+
+
+    private static enum menu{
+        scan,
+        login,
+        main,
+        quick,
+        costum,
+        saldo,
+        bon,
+        end
+    }
+
+    private static menu currentScreen;
+
     private static final String withdraw_URL = "http://145.24.222.175:5000/withdraw";
     private static final String balance_URL = "http://145.24.222.175:5000/balance";
     private static final String login_URL = "http://145.24.222.175:5000/login";
     private static HttpClient client = HttpClient.newHttpClient();
 
-    private static Arduino AdruinoCon = new Arduino("COM9", 9600);
+    private static Arduino AdruinoCon = new Arduino("COM11", 9600);
 
+
+    /*
+     * GUI function 
+     */
+    public static void setPanelStuff(){
+        panelCont.setLayout(cl);
+        Font arial40 = new Font("Arial", Font.PLAIN, 40);
+        Font arial25 = new Font("Arial", Font.PLAIN, 25);
+        Font arial80 = new Font("Arial", Font.PLAIN, 80);
+
+        button1.setFont(arial80);
+        button1.setBackground(Color.DARK_GRAY);
+        button1.setForeground(Color.WHITE);
+        button2_1.setFont(arial40);
+        button2_1.setBackground(Color.DARK_GRAY);
+        button2_1.setForeground(Color.WHITE);
+        button2_2.setFont(arial40);
+        button2_2.setBackground(Color.DARK_GRAY);
+        button2_2.setForeground(Color.WHITE);
+        button2_3.setFont(arial40);
+        button2_3.setBackground(Color.DARK_GRAY);
+        button2_3.setForeground(Color.WHITE);
+        button3_1.setFont(arial40);
+        button3_1.setBackground(Color.DARK_GRAY);
+        button3_1.setForeground(Color.WHITE);
+        button3_2.setFont(arial40);
+        button3_2.setBackground(Color.DARK_GRAY);
+        button3_2.setForeground(Color.WHITE);
+        button3_3.setFont(arial40);
+        button3_3.setBackground(Color.DARK_GRAY);
+        button3_3.setForeground(Color.WHITE);
+        button3_4.setFont(arial40);
+        button3_4.setBackground(Color.DARK_GRAY);
+        button3_4.setForeground(Color.WHITE);
+        button4_1.setFont(arial40);
+        button4_1.setBackground(Color.DARK_GRAY);
+        button4_1.setForeground(Color.WHITE);
+        button4_2.setFont(arial40);
+        button4_2.setBackground(Color.DARK_GRAY);
+        button4_2.setForeground(Color.WHITE);
+        button4_3.setFont(arial40);
+        button4_3.setBackground(Color.DARK_GRAY);
+        button4_3.setForeground(Color.WHITE);
+        button4_4.setFont(arial40);
+        button4_4.setBackground(Color.DARK_GRAY);
+        button4_4.setForeground(Color.WHITE);
+        button4_5.setFont(arial40);
+        button4_5.setBackground(Color.DARK_GRAY);
+        button4_5.setForeground(Color.WHITE);
+        button4_6.setFont(arial40);
+        button4_6.setBackground(Color.DARK_GRAY);
+        button4_6.setForeground(Color.WHITE);
+        button4_7.setFont(arial40);
+        button4_7.setBackground(Color.DARK_GRAY);
+        button4_7.setForeground(Color.WHITE);
+        button4_8.setFont(arial40);
+        button4_8.setBackground(Color.DARK_GRAY);
+        button4_8.setForeground(Color.WHITE);
+        button4_9.setFont(arial25);
+        button4_9.setBackground(Color.DARK_GRAY);
+        button4_9.setForeground(Color.WHITE);
+        button5_1.setFont(arial40);
+        button5_1.setBackground(Color.DARK_GRAY);
+        button5_1.setForeground(Color.WHITE);
+        button5_2.setFont(arial40);
+        button5_2.setBackground(Color.DARK_GRAY);
+        button5_2.setForeground(Color.WHITE);
+        button6_1.setFont(arial40);
+        button6_1.setBackground(Color.DARK_GRAY);
+        button6_1.setForeground(Color.WHITE);
+        button7_1.setFont(arial40);
+        button7_1.setBackground(Color.DARK_GRAY);
+        button7_1.setForeground(Color.WHITE);
+        button7_2.setFont(arial40);
+        button7_2.setBackground(Color.DARK_GRAY);
+        button7_2.setForeground(Color.WHITE);
+        button8_1.setFont(arial40);
+        button8_1.setBackground(Color.DARK_GRAY);
+        button8_1.setForeground(Color.WHITE);
+        button9_1.setFont(arial40);
+        button9_1.setBackground(Color.DARK_GRAY);
+        button9_1.setForeground(Color.WHITE);
+        button9_2.setFont(arial40);
+        button9_2.setBackground(Color.DARK_GRAY);
+        button9_2.setForeground(Color.WHITE);
+        button10_1.setFont(arial40);
+        button10_1.setBackground(Color.DARK_GRAY);
+        button10_1.setForeground(Color.WHITE);
+        button10_2.setFont(arial40);
+        button10_2.setBackground(Color.DARK_GRAY);
+        button10_2.setForeground(Color.WHITE);
+        button11_1.setFont(arial40);
+        button11_1.setBackground(Color.DARK_GRAY);
+        button11_1.setForeground(Color.WHITE);
+        button11_2.setFont(arial40);
+        button11_2.setBackground(Color.DARK_GRAY);
+        button11_2.setForeground(Color.WHITE);
+        button11_3.setFont(arial40);
+        button11_3.setBackground(Color.DARK_GRAY);
+        button11_3.setForeground(Color.WHITE);
+
+        panel1.add(button1);
+
+        panel2.add(button2_1);
+        panel2.add(button2_2);
+        panel2.add(button2_3);
+
+        panel3.add(button3_1);
+        panel3.add(button3_2);
+        panel3.add(button3_3);
+        panel3.add(button3_4);
+
+        panel4.add(button4_1);
+        panel4.add(button4_2);
+        panel4.add(button4_3);
+        panel4.add(button4_4);
+        panel4.add(button4_5);
+        panel4.add(button4_6);
+        panel4.add(button4_7);
+        panel4.add(button4_8);
+        panel4.add(button4_9);
+
+        panel5.add(button5_1);
+        panel5.add(button5_2);
+
+        panel6.add(button6_1);
+
+        panel7.add(button7_1);
+        panel7.add(button7_2);
+
+        panel8.add(button8_1);
+
+        panel9.add(button9_1);
+        panel9.add(button9_2);
+
+        panel10.add(button10_1);
+        panel10.add(button10_2);
+
+        panel11.add(button11_1);
+        panel11.add(button11_2);
+        panel11.add(button11_3);
+
+        panelCont.add(panel1, "scan");      // panel 1 = scan kaart
+        panelCont.add(panel2, "login");     // panel 2 = verder/annuleren
+        panelCont.add(panel3, "main");      // panel 3 = keuzemenu 
+        panelCont.add(panel4, "quick");     // panel 4 = keuzemenu geld 
+        panelCont.add(panel5, "saldo");     // panel 5 = terug / afsluiten
+        panelCont.add(panel6, "printing");  // panel 6= geld komt er aan
+        panelCont.add(panel7, "backToMenu");// panel 7 = wilt u terug naar het hoofd menu of afsluiten
+        panelCont.add(panel8, "end");       // panel 8= fijne dag
+        panelCont.add(panel9, "confirm");   // panel 9 = weet u het zeker, ja of nee
+        panelCont.add(panel10, "bon");      // panel 10 = wilt u de bon
+        panelCont.add(panel11, "costum");   // panel 11 = voer uw gewenste bedrag in
+
+    }
 
 
     /*
@@ -61,7 +296,7 @@ public class main {
      * so that does not have to be checked here
      * the functions return the whole response so it can be discected in other functions
      */
-    private static HttpResponse postBalance(String IBAN) throws Exception{
+    private static String postBalance(String IBAN) throws Exception{
 
         String inputs = ("/" + IBAN);
         HttpRequest request = HttpRequest.newBuilder()
@@ -73,7 +308,7 @@ public class main {
         // System.out.println(response.statusCode());
         // System.out.println(response.body());
 
-        return response;
+        return response.body();
     }
     
     private static HttpResponse postWithdraw(String IBAN, int amount) throws Exception{
@@ -114,6 +349,17 @@ public class main {
         return Integer.parseInt(res[0]);
     }
 
+    public static String getBalance(String iban){ //"/CH33SHIP0354400312"
+        String temp1 = "", temp2 = "";
+
+        try {
+            temp1 = postBalance(iban);
+            temp2 = String.valueOf(parseBalance(temp1));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp2;
+    }
 
 
     private static void newLogin(HttpResponse response) throws Exception {
@@ -128,6 +374,12 @@ public class main {
         }
     }
 
+    // private static menu navigate(String nav) throws Exception{
+    //     menu toNav;
+    //     if()
+
+
+    // }
 
 
 
@@ -135,25 +387,11 @@ public class main {
      * This is the serial interpreter, it receives the incomming information and interpretes it
      * to figure out which funtion the seponse is meant for
      */
-    private static void readSerial() throws Exception {
-        String inputString = AdruinoCon.serialRead(); 
-        String inputSplit[] = inputString.substring(0).split(",");
-        //hier kunnen terug gestuurde commandos verwerkt worden
-        if(inputSplit[0] == "PIN"){
-            //hier moet de code om de login ter verifieren of om terug te reageren
-            // postlogin, iban, pin            
-            HttpResponse response = postLogin(inputSplit[1], Integer.parseInt(inputSplit[2]));
-            newLogin(response);
-        
-        //menu navigatie
-        }
-        else if(inputSplit[0] == "NAV"){
-            
-        }
-        else if(inputSplit[0] == "MON"){
 
-        }
-    }
+    // private static void readSerial(String inputString) throws Exception {
+         
+
+    // }
     
 
 
@@ -194,17 +432,160 @@ public class main {
      *  -> uitloggen
      */
     public static void main(String[] args) throws Exception {
-        
-
         /*
-         * This is meant to be running constantly the collect information from the serial port
-         * the information comes in as a string and is split up into the inputsplit array
-         * this seperates all the single values seperated on every, 
-         */
-        while(true){
-           
-            readSerial();
+        * This is meant to be running constantly the collect information from the serial port
+        * the information comes in as a string and is split up into the inputsplit array
+        * this seperates all the single values seperated on every, 
+        */
+        setPanelStuff();
+        
+        String inputString;
+        int costumAmount;
 
+        currentScreen = menu.saldo;
+
+        frame.add(panelCont);
+        frame.pack();
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1280, 720); // UI window size (create in the main)
+        frame.setVisible(true); // set the UI visible (can also be into the void serialEvent)
+
+        while(true){
+            inputString = "";
+            costumAmount = 0;
+            String ibanInUse = "";
+
+            if(AdruinoCon.openConnection()){
+                inputString = AdruinoCon.serialRead();
+                System.out.println("received message:" + inputString);
+
+                String inputSplit[] = inputString.substring(0).split(",");
+                //hier kunnen terug gestuurde commandos verwerkt worden
+                if(inputSplit[0] == "PIN"){
+                    //hier moet de code om de login ter verifieren of om terug te reageren
+                    // postlogin, iban, pin            
+                    //HttpResponse response = postLogin(inputSplit[1], Integer.parseInt(inputSplit[2]));
+                    //newLogin(response);
+
+                    ibanInUse = inputSplit[1];
+
+                }
+                else if(inputSplit[0] == "NAV"){
+                    // navigate
+                }
+                else if(inputSplit[0] == "MON"){
+                    
+                }else{ // dan is het normale navigatie, een enkele input
+
+                }
+
+            }
+
+            switch(currentScreen){
+                
+                case scan:
+                    cl.show(panelCont, "scan");
+                    //wanneer er wordt ingelogt navigeer naar 
+                    break;
+
+                case login:
+                    cl.show(panelCont, "login");
+                    //loginfunctie
+                    break;
+
+                case main:
+                    cl.show(panelCont, "main");
+                    if(inputString == "1"){
+                        currentScreen = menu.quick;
+                    }
+                    if(inputString == "2"){
+                        currentScreen = menu.costum;
+                    }
+                    if(inputString == "3"){
+                        saldo = getBalance(ibanInUse);
+
+                        currentScreen = menu.saldo;
+                    }
+                    if(inputString == "B"){
+                        currentScreen = menu.end;
+                    }
+                    break;
+
+                case quick:
+                    
+                    cl.show(panelCont, "quick");
+                    if(inputString == "1"){
+                        if(AdruinoCon.openConnection()){ 
+                            sendEurCommand(0,0,0);       
+                        }
+                    }
+                    if(inputString == "4"){
+                        if(AdruinoCon.openConnection()){ 
+                            sendEurCommand(0,0,0);       
+                        }
+                    }
+                    if(inputString == "7"){
+                        if(AdruinoCon.openConnection()){ 
+                            sendEurCommand(0,0,0);       
+                        }
+                    }
+                    if(inputString == "3"){
+                        if(AdruinoCon.openConnection()){ 
+                            sendEurCommand(0,0,0);       
+                        }
+                    }
+                    if(inputString == "6"){
+                        if(AdruinoCon.openConnection()){ 
+                            sendEurCommand(0,0,0);       
+                        }
+                    }
+                    if(inputString == "9"){
+                        if(AdruinoCon.openConnection()){ 
+                            sendEurCommand(0,0,0);       
+                        }
+                    }
+                    if(inputString == "A"){
+                        currentScreen = menu.main; 
+                    }
+                    break;
+
+                case costum:
+                    cl.show(panelCont, "costum");
+                    
+                    //sendCommand() om het de zelf bedrag invoer aan te zetten
+                    //costumAmount = receivedamount;
+                    if(inputString == "#"){
+                        currentScreen = menu.bon;
+                    }
+                    break;
+
+                case saldo:
+                    //pas de saldostring aan
+                    cl.show(panelCont, "saldo");
+                    if(inputString == "B"){
+                        currentScreen = menu.end;
+                    }
+                    if(inputString == "B"){
+                        currentScreen = menu.end;
+                    }
+                    break;
+
+                case bon:
+                    cl.show(panelCont, "bon");
+                    if(inputString == "A"){
+                        currentScreen = menu.end;
+                        sendBonCommand(costumAmount, ibanInUse);
+                    }
+                    if(inputString == "B"){
+                        currentScreen = menu.end;
+                    }
+                    break;
+
+                case end:
+                    cl.show(panelCont, "end");
+                    break;
+            }
         }
     } 
 }
