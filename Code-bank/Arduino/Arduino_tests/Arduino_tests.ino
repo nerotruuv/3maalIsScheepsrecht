@@ -1,3 +1,4 @@
+#include <SPI.h>
 #include <MFRC522.h>
 #include <Keypad.h>
 
@@ -14,23 +15,21 @@
 #define motor2 21
 #define motor3 22
 
-#define SS_PIN 10
 #define RST_PIN 9
+#define SS_PIN 53
+
 
 SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+MFRC522::StatusCode status;
+  byte block;
+  byte len;
 
 String readString = "";
 String inputArray[5];
 char strbuf[30];
 
-enum menu
-{
-  pin = 1,
-  main = 2
-};
-enum menu current_menu;
 
 const byte ROWS = 4;
 const byte COLS = 4;
@@ -41,12 +40,15 @@ char hexaKeys[ROWS][COLS] = {
   {'*', '0', '#', 'D'}
 };
 
-byte rowPins[ROWS] = {8, 7, 6, 5};
-byte colPins[COLS] = {4, 3, 2, A5};
-Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+byte rowPins[ROWS] = {36,34,32,30};
+byte colPins[COLS] = {37,35,33,31};
+Keypad myKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
   Serial.begin(9600);
+  while (!Serial);
+  SPI.begin();
+  mfrc522.PCD_Init();    // Init MFRC522
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
@@ -128,32 +130,78 @@ void functieParser(String input){
     String IBAN = splitter->getItemAtIndex(2);
     printReceipt(total, IBAN);
   
+  }else if(function.equals("PIN")){
+    getPin();
+
+  }else if(function.equals("MON")){
+    getCostum();
+    
   }else{
     Serial.println("binnengekomen functie komt niet overeen");
   }
 }
 
 
-String getPin(){
-  String inputPin;
-  int inputCount = 0;
-  while(inputCount < 4){
-    char pin = customKeypad.getKey();
-    if(pin){
-      inputPin += pin;
-      inputCount++;
+void getCostum(){
+  int digit = 0;
+  String costum = "";
+  while(true){
+    char keypressed = myKeypad.getKey();
+    if (keypressed != NO_KEY){
+      digit++;
+      if(keypressed != '#'){
+        Serial.print(keypressed);
+        costum += keypressed;
+      }else{
+        break;
+      }
     }
   }
-  return inputPin;
+  Serial.print("MON,"+costum);
 }
 
-String getPass(){
-  String passHex; 
-  for (byte i = 0; i < mfrc522.uid.size; i++) {
-     passHex += String(mfrc522.uid.uidByte[i], HEX); 
+void getPin(){
+  int digit = 0;
+  String pin = "";
+  while(true){
+    char keypressed = myKeypad.getKey();
+    if (keypressed != NO_KEY){
+      digit++;
+      if(keypressed != '#'){
+        Serial.print(keypressed);
+        pin += keypressed;
+      }else{
+        break;
+      }
+    }
   }
-  return passHex;   
+  Serial.print("PIN," + pin);
 }
+
+void getPass(){
+  byte ibanBuffer[16];
+  status = mfrc522.MIFARE_Read(block, ibanBuffer, &len);
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print(F("Reading failed: "));
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+  for (uint8_t i = 0; i < 16; i++)
+  {
+    if (ibanBuffer[i] != 64)
+    {
+      Serial.write(ibanBuffer[i]);
+    }
+  }
+//  String passHex; 
+//  for (byte i = 0; i < mfrc522.uid.size; i++) {
+//     passHex += String(mfrc522.uid.uidByte[i], HEX); 
+//  }
+//  return passHex; 
+}
+  
+   
+
 void writePinInput(String Pin, String IBAN){
   String message = "PIN," + Pin + "," + IBAN;
   Serial.print(message);
@@ -162,44 +210,59 @@ void writePinInput(String Pin, String IBAN){
 
 //  input binnenhalen (pin en IBAN), versturen naar java met PIN,pin,IBAN
 //  en vervolgens wachte op nieuwe input
-void checkLogin(){
-  String IBAN = getPass();
-  String pin = getPin();
-  writePinInput(pin, IBAN);
 
-  //wait until a reply is given
-  readString = "";
-  while (Serial.available()) {
-    char c = Serial.read();  // current char from serial
-    readString += c; // add to string
-    delay(2);  //slow looping to allow buffer to fill with next character
-  }
-  functieParser(readString);
-}
+//void checkLogin(){
+//  String IBAN = getPass();
+//  String pin = getPin();
+//  writePinInput(pin, IBAN);
+//
+//  //wait until a reply is given
+//  readString = "";
+//  while (Serial.available()) {
+//    char c = Serial.read();  // current char from serial
+//    readString += c; // add to string
+//    delay(2);  //slow looping to allow buffer to fill with next character
+//  }
+//  functieParser(readString);
+//}
 
 
 void loop() {
-  Serial.print("PIN,1234,NL76RABO0354400312");
-  delay(2000);
-}
+//  Serial.print("PIN,1234,NL76RABO0354400312");
+//  delay(2000);
 
+  if ( ! mfrc522.PICC_IsNewCardPresent()) {
+    return;
+  }
+  // check of er een nieuwe pas is die inlogt
+  if( ! mfrc522.PICC_ReadCardSerial()){
+    return;
+  }
+
+  // als er een pas is gedetecteerd die niet hetzelfde is als de oude pas, dan kan het door naar de juice
+  Serial.print("new pass: ");
+  getPass();
+  //String ibanInUse = getPass();
+  //Serial.print("NEW," + ibanInUse);
   
-//  // check of er een nieuwe pas is die inlogt
-//  if( ! mfrc522.PICC_ReadCardSerial()){
-//    return;
-//  }
-//  if ( ! mfrc522.PICC_IsNewCardPresent()) {
-//    return;
-//  }
-//  // als er een pas is gedetecteerd die niet hetzelfde is als de oude pas, dan kan het door naar de juice
-//  else{
-//    while(true){
-//      switch(
-//        Serial.print("NAV,LOG"); // naar het login scherm navigeren
-//        //checkLogin();
-//    }
-//  }
+  while(true){
+    char keypressed = myKeypad.getKey();
+      if (keypressed != NO_KEY){
+        Serial.print(keypressed);
+      }
+    
+    readString = "";
+    while (Serial.available()) {
+      char c = Serial.read();  // current char from serial
+      readString += c; // add to string
+      delay(2);  //slow looping to allow buffer to fill with next character
+    }
 
+    if (readString.length() >0) {
+      functieParser(readString);    
+    }
+  }
+}
 
 
 

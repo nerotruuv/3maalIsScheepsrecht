@@ -104,7 +104,7 @@ public class main {
     private static final String login_URL = "http://145.24.222.175:5000/login";
     private static HttpClient client = HttpClient.newHttpClient();
 
-    private static Arduino AdruinoCon = new Arduino("COM11", 9600);
+    private static Arduino AdruinoCon = new Arduino("COM3", 9600);
 
 
     /*
@@ -306,7 +306,7 @@ public class main {
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
         // System.out.println(response.statusCode());
-        // System.out.println(response.body());
+        System.out.println(response.body());
 
         return response.body();
     }
@@ -364,13 +364,17 @@ public class main {
 
     private static void newLogin(HttpResponse response) throws Exception {
         if(response.statusCode() == 403){ // geblokkeerd
+            currentScreen = menu.end;
             System.out.print("get cucked");
+
         }else if(response.statusCode() == 401){// verkeerde pin
             System.out.println("verkeerde pin");
-            sendLogCommand(0);
+            sendCommand("PIN");
+
         }else if(response.statusCode() == 200){
             System.out.println("Pin succesvol");
-            sendLogCommand(1);
+            currentScreen = menu.main;
+            //sendLogCommand(1);
         }
     }
 
@@ -437,12 +441,13 @@ public class main {
         * the information comes in as a string and is split up into the inputsplit array
         * this seperates all the single values seperated on every, 
         */
+        
         setPanelStuff();
         
         String inputString;
         int costumAmount;
 
-        currentScreen = menu.saldo;
+        currentScreen = menu.scan;
 
         frame.add(panelCont);
         frame.pack();
@@ -462,24 +467,21 @@ public class main {
 
                 String inputSplit[] = inputString.substring(0).split(",");
                 //hier kunnen terug gestuurde commandos verwerkt worden
-                if(inputSplit[0] == "PIN"){
+                if(inputSplit[0] == "NEW"){
+                    ibanInUse = inputSplit[1];
+                    currentScreen = menu.login;
+
+                }else if(inputSplit[0] == "PIN"){
                     //hier moet de code om de login ter verifieren of om terug te reageren
                     // postlogin, iban, pin            
-                    //HttpResponse response = postLogin(inputSplit[1], Integer.parseInt(inputSplit[2]));
-                    //newLogin(response);
+                    HttpResponse response = postLogin(ibanInUse, Integer.parseInt(inputSplit[1]));
+                    newLogin(response);
 
-                    ibanInUse = inputSplit[1];
-
-                }
-                else if(inputSplit[0] == "NAV"){
-                    // navigate
-                }
-                else if(inputSplit[0] == "MON"){
+                }else if(inputSplit[0] == "MON"){
                     
                 }else{ // dan is het normale navigatie, een enkele input
-
+                    System.out.println("input given x");
                 }
-
             }
 
             switch(currentScreen){
@@ -491,7 +493,7 @@ public class main {
 
                 case login:
                     cl.show(panelCont, "login");
-                    //loginfunctie
+                    sendCommand("PIN");
                     break;
 
                 case main:
@@ -513,7 +515,6 @@ public class main {
                     break;
 
                 case quick:
-                    
                     cl.show(panelCont, "quick");
                     if(inputString == "1"){
                         if(AdruinoCon.openConnection()){ 
@@ -553,8 +554,7 @@ public class main {
                 case costum:
                     cl.show(panelCont, "costum");
                     
-                    //sendCommand() om het de zelf bedrag invoer aan te zetten
-                    //costumAmount = receivedamount;
+                    sendCommand("MON"); 
                     if(inputString == "#"){
                         currentScreen = menu.bon;
                     }
@@ -563,8 +563,8 @@ public class main {
                 case saldo:
                     //pas de saldostring aan
                     cl.show(panelCont, "saldo");
-                    if(inputString == "B"){
-                        currentScreen = menu.end;
+                    if(inputString == "A"){
+                        currentScreen = menu.main;
                     }
                     if(inputString == "B"){
                         currentScreen = menu.end;
