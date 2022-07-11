@@ -25,6 +25,7 @@ public class main {
     * alle gui declaraties
     */
     static String saldo = "something";
+    static String costumAmount = "";
 
     static JFrame frame = new JFrame("My First GUI"); // UI window creation
     static JButton button1 = new JButton("Scan uw kaart");
@@ -65,7 +66,7 @@ public class main {
     static JButton button10_2 = new JButton("[A] Ja                                [B] Nee");
 
     static JButton button11_1 = new JButton("Voer uw gewenste bedrag in");
-    static JButton button11_2 = new JButton("");
+    static JButton button11_2 = new JButton(costumAmount);
     static JButton button11_3 = new JButton("[#] Verder");
 
     static JPanel panelCont = new JPanel();
@@ -84,7 +85,8 @@ public class main {
 
     static CardLayout cl = new CardLayout();
 
-
+    //bill in machine
+    static int bim10 = 10, bim20 = 10, bim50 = 10; 
 
     private static enum menu{
         scan,
@@ -104,7 +106,7 @@ public class main {
     private static final String login_URL = "http://145.24.222.175:5000/login";
     private static HttpClient client = HttpClient.newHttpClient();
 
-    private static Arduino AdruinoCon = new Arduino("COM3", 9600);
+    private static Arduino AdruinoCon = new Arduino("COM9", 9600);
 
 
     /*
@@ -445,7 +447,8 @@ public class main {
         setPanelStuff();
         
         String inputString;
-        int costumAmount;
+        int costumbil10 = 0, costumbil20 = 0, costumbil50 = 0;
+        
 
         currentScreen = menu.scan;
 
@@ -458,7 +461,6 @@ public class main {
 
         while(true){
             inputString = "";
-            costumAmount = 0;
             String ibanInUse = "";
 
             if(AdruinoCon.openConnection()){
@@ -466,21 +468,42 @@ public class main {
                 System.out.println("received message:" + inputString);
 
                 String inputSplit[] = inputString.substring(0).split(",");
+                System.out.println(inputSplit[0]);
                 //hier kunnen terug gestuurde commandos verwerkt worden
-                if(inputSplit[0] == "NEW"){
+                if(inputSplit[0].equals("NEW")){
+                    System.out.println("new pass");
                     ibanInUse = inputSplit[1];
                     currentScreen = menu.login;
 
-                }else if(inputSplit[0] == "PIN"){
+                }else if(inputSplit[0].equals("PIN")){
                     //hier moet de code om de login ter verifieren of om terug te reageren
                     // postlogin, iban, pin            
                     HttpResponse response = postLogin(ibanInUse, Integer.parseInt(inputSplit[1]));
                     newLogin(response);
 
-                }else if(inputSplit[0] == "MON"){
+                }else if(inputSplit[0].equals("MON")){
+                    costumAmount = inputSplit[1];
+                    int costumInt = Integer.parseInt(costumAmount);
                     
-                }else{ // dan is het normale navigatie, een enkele input
-                    System.out.println("input given x");
+
+                    while((costumInt % 50 > 0) && bim50 > 1){
+                        bim50--;
+                        costumbil50++;
+                        costumInt-=50;
+                    }
+                    while((costumInt % 20 > 0) && bim20 > 1){
+                        bim20--;
+                        costumbil20++;
+                        costumInt-=20;
+                    }
+                    while((costumInt % 10 > 0) && bim10 > 1){
+                        bim10--;
+                        costumbil10++;
+                        costumInt-=10;
+                    }
+                    costumAmount = String.valueOf(costumbil50 + costumbil20 + costumbil10);
+
+
                 }
             }
 
@@ -498,55 +521,76 @@ public class main {
 
                 case main:
                     cl.show(panelCont, "main");
-                    if(inputString == "1"){
+                    if(inputString.equals("1")){
                         currentScreen = menu.quick;
                     }
-                    if(inputString == "2"){
+                    if(inputString.equals("2")){
                         currentScreen = menu.costum;
                     }
-                    if(inputString == "3"){
+                    if(inputString.equals("3")){
                         saldo = getBalance(ibanInUse);
 
                         currentScreen = menu.saldo;
                     }
-                    if(inputString == "B"){
+                    if(inputString.equals("B")){
                         currentScreen = menu.end;
                     }
                     break;
 
                 case quick:
                     cl.show(panelCont, "quick");
-                    if(inputString == "1"){
+                    if(inputString.equals("1")){
                         if(AdruinoCon.openConnection()){ 
-                            sendEurCommand(0,0,0);       
+                            if(bim20 > 1 ){
+                                bim20--;
+                                sendEurCommand(0,1,0);
+                            }else if(bim10 > 2){
+                                bim10 -= 2;
+                                sendEurCommand(2,0,0);
+                            }
+                                   
                         }
                     }
-                    if(inputString == "4"){
+                    if(inputString.equals("4")){
                         if(AdruinoCon.openConnection()){ 
-                            sendEurCommand(0,0,0);       
+                            if(bim50 > 1 ){
+                                bim50--;
+                                sendEurCommand(0,0,1);
+                            }else if(bim20 > 2 && bim10 > 1){
+                                bim20 -= 2;
+                                bim10 -= 1;
+                                sendEurCommand(1,2,0);
+                            }       
                         }
                     }
-                    if(inputString == "7"){
+                    if(inputString.equals("7")){
                         if(AdruinoCon.openConnection()){ 
-                            sendEurCommand(0,0,0);       
+                            if(bim50 > 2){
+                                bim50 -= 2;
+                                sendEurCommand(0,0,2); 
+                            }        
                         }
                     }
-                    if(inputString == "3"){
+                    if(inputString.equals("3")){
                         if(AdruinoCon.openConnection()){ 
-                            sendEurCommand(0,0,0);       
+                            if(bim50 > 4){
+                                bim50 -= 4;
+                                sendEurCommand(0,0,4); 
+                            }       
                         }
                     }
-                    if(inputString == "6"){
+                    if(inputString.equals("6")){
                         if(AdruinoCon.openConnection()){ 
-                            sendEurCommand(0,0,0);       
+                            if(bim50 > 6){
+                                bim50 -= 2;
+                                sendEurCommand(0,0,6); 
+                            }       
                         }
                     }
-                    if(inputString == "9"){
-                        if(AdruinoCon.openConnection()){ 
-                            sendEurCommand(0,0,0);       
-                        }
+                    if(inputString.equals("9")){
+                        currentScreen = menu.costum;
                     }
-                    if(inputString == "A"){
+                    if(inputString.equals("A")){
                         currentScreen = menu.main; 
                     }
                     break;
@@ -554,8 +598,12 @@ public class main {
                 case costum:
                     cl.show(panelCont, "costum");
                     
-                    sendCommand("MON"); 
-                    if(inputString == "#"){
+                    sendCommand("MON");
+                    if(inputString.equals("C")){
+                        sendCommand("MON");
+                    }
+                    if(inputString.equals("#")){
+                        sendEurCommand(costumbil10, costumbil20, costumbil50);
                         currentScreen = menu.bon;
                     }
                     break;
@@ -563,21 +611,21 @@ public class main {
                 case saldo:
                     //pas de saldostring aan
                     cl.show(panelCont, "saldo");
-                    if(inputString == "A"){
+                    if(inputString.equals("A")){
                         currentScreen = menu.main;
                     }
-                    if(inputString == "B"){
+                    if(inputString.equals("B")){
                         currentScreen = menu.end;
                     }
                     break;
 
                 case bon:
                     cl.show(panelCont, "bon");
-                    if(inputString == "A"){
+                    if(inputString.equals("A")){
                         currentScreen = menu.end;
-                        sendBonCommand(costumAmount, ibanInUse);
+                        sendBonCommand(Integer.parseInt(costumAmount), ibanInUse);
                     }
-                    if(inputString == "B"){
+                    if(inputString.equals("B")){
                         currentScreen = menu.end;
                     }
                     break;

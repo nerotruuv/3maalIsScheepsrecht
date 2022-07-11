@@ -22,9 +22,9 @@
 SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 MFRC522 mfrc522(SS_PIN, RST_PIN);
-MFRC522::StatusCode status;
-  byte block;
-  byte len;
+
+byte block;
+byte len;
 
 String readString = "";
 String inputArray[5];
@@ -49,9 +49,10 @@ void setup() {
   while (!Serial);
   SPI.begin();
   mfrc522.PCD_Init();    // Init MFRC522
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+  Serial.println("scan card");
 
+//  pinMode(LED_BUILTIN, OUTPUT);
+}
 
 void cashMotor(int motorPin, int rotations){
   for(int i = 0; i < rotations; i++){
@@ -60,6 +61,7 @@ void cashMotor(int motorPin, int rotations){
     digitalWrite(motorPin, LOW);
   }
 }
+
 
 //bonprint funtie maken
 void printCash(int bil1, int bil2, int bil3){  
@@ -76,7 +78,7 @@ void printReceipt(int total, String IBAN){
   printer.println(F("3 Maal is\nScheepsrecht\n"));
   
   //logo is super traag
-  printer.printBitmap(adalogo_width, adalogo_height, adalogo_data);
+  //printer.printBitmap(adalogo_width, adalogo_height, adalogo_data);
   printer.setSize('M');
   printer.println(F("OPNAME BILJETTEN\n"));
 
@@ -178,27 +180,30 @@ void getPin(){
   Serial.print("PIN," + pin);
 }
 
-void getPass(){
-  byte ibanBuffer[16];
-  status = mfrc522.MIFARE_Read(block, ibanBuffer, &len);
-  if (status != MFRC522::STATUS_OK) {
-    Serial.print(F("Reading failed: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    return;
+String getPass(){
+  String passHex; 
+  for (byte i = 0; i < mfrc522.uid.size; i++) {
+     passHex += String(mfrc522.uid.uidByte[i], HEX); 
   }
-  for (uint8_t i = 0; i < 16; i++)
-  {
-    if (ibanBuffer[i] != 64)
-    {
-      Serial.write(ibanBuffer[i]);
-    }
-  }
-//  String passHex; 
-//  for (byte i = 0; i < mfrc522.uid.size; i++) {
-//     passHex += String(mfrc522.uid.uidByte[i], HEX); 
-//  }
-//  return passHex; 
+  passHex.toUpperCase();
+  return passHex;
 }
+//  byte ibanBuffer[16];
+//  status = mfrc522.MIFARE_Read(block, ibanBuffer, &len);
+//  if (status != MFRC522::STATUS_OK) {
+//    Serial.print(F("Reading failed: "));
+//    Serial.println(mfrc522.GetStatusCodeName(status));
+//    return;
+//  }
+//  for (uint8_t i = 0; i < 16; i++)
+//  {
+//    if (ibanBuffer[i] != 64)
+//    {
+//      Serial.write(ibanBuffer[i]);
+//    }
+//  }
+ 
+
   
    
 
@@ -230,20 +235,23 @@ void writePinInput(String Pin, String IBAN){
 void loop() {
 //  Serial.print("PIN,1234,NL76RABO0354400312");
 //  delay(2000);
-
+  
+  
+  // check of er een nieuwe pas is die inlogt
   if ( ! mfrc522.PICC_IsNewCardPresent()) {
     return;
   }
-  // check of er een nieuwe pas is die inlogt
+  
   if( ! mfrc522.PICC_ReadCardSerial()){
     return;
   }
-
+  
+  
   // als er een pas is gedetecteerd die niet hetzelfde is als de oude pas, dan kan het door naar de juice
-  Serial.print("new pass: ");
-  getPass();
-  //String ibanInUse = getPass();
-  //Serial.print("NEW," + ibanInUse);
+  //getPass();
+  String ibanInUse = getPass();
+  //Serial.print(ibanInUse);
+  Serial.print("NEW," + ibanInUse);
   
   while(true){
     char keypressed = myKeypad.getKey();
@@ -253,6 +261,7 @@ void loop() {
     
     readString = "";
     while (Serial.available()) {
+      Serial.print("im in a while");
       char c = Serial.read();  // current char from serial
       readString += c; // add to string
       delay(2);  //slow looping to allow buffer to fill with next character
