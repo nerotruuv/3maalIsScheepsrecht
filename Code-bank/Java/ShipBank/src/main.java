@@ -465,6 +465,7 @@ public class main {
 
             if(AdruinoCon.openConnection()){
                 inputString = AdruinoCon.serialRead();
+                
                 System.out.println("received message:" + inputString);
 
                 String inputSplit[] = inputString.substring(0).split(",");
@@ -516,6 +517,7 @@ public class main {
 
                 case login:
                     cl.show(panelCont, "login");
+                    System.out.println("logging in");
                     sendCommand("PIN");
                     break;
 

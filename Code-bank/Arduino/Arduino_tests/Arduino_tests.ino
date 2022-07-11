@@ -107,7 +107,7 @@ void printReceipt(int total, String IBAN){
 }
 
 
-void functieParser(String input){
+boolean functieParser(String input){
   String function = input.substring(0,2);
   StringSplitter *splitter;
   // LOG, PIN, IBAN
@@ -116,7 +116,8 @@ void functieParser(String input){
     int pin = splitter->getItemAtIndex(1).toInt();
     String IBAN = splitter->getItemAtIndex(2);
     // hier moet komen of verwezen worden naar dhoe de codes afgehandeld worden
-
+    return true;
+    
   // EUR, BIL1, BIL2, BIL3
   }else if(function.equals("EUR")){
     splitter = new StringSplitter(readString, ',', 4);
@@ -124,22 +125,26 @@ void functieParser(String input){
     int BIL2 = splitter->getItemAtIndex(2).toInt();
     int BIL3 = splitter->getItemAtIndex(3).toInt();
     printCash(BIL1, BIL2, BIL3);
-
+    return true;
+    
   // BON, TOTAL, IBAN
   }else if(function.equals("BON")){
     splitter = new StringSplitter(readString, ',', 3);
     int total = splitter->getItemAtIndex(1).toInt();
     String IBAN = splitter->getItemAtIndex(2);
     printReceipt(total, IBAN);
-  
+    return true;
+    
   }else if(function.equals("PIN")){
+    Serial.print("recievedPIN");
     getPin();
-
+    return true;
+    
   }else if(function.equals("MON")){
     getCostum();
-    
+    return true;
   }else{
-    Serial.println("binnengekomen functie komt niet overeen");
+    return false;
   }
 }
 
@@ -207,10 +212,10 @@ String getPass(){
   
    
 
-void writePinInput(String Pin, String IBAN){
-  String message = "PIN," + Pin + "," + IBAN;
-  Serial.print(message);
-}
+//void writePinInput(String Pin, String IBAN){
+//  String message = "PIN," + Pin + "," + IBAN;
+//  Serial.print(message);
+//}
 
 
 //  input binnenhalen (pin en IBAN), versturen naar java met PIN,pin,IBAN
@@ -252,23 +257,23 @@ void loop() {
   String ibanInUse = getPass();
   //Serial.print(ibanInUse);
   Serial.print("NEW," + ibanInUse);
-  
+
+
   while(true){
-    char keypressed = myKeypad.getKey();
-      if (keypressed != NO_KEY){
-        Serial.print(keypressed);
-      }
+    if (readString.length() >0) {
+      functieParser(readString);    
+    }
     
     readString = "";
     while (Serial.available()) {
-      Serial.print("im in a while");
+      //Serial.print("im in a while");
       char c = Serial.read();  // current char from serial
       readString += c; // add to string
       delay(2);  //slow looping to allow buffer to fill with next character
     }
-
-    if (readString.length() >0) {
-      functieParser(readString);    
+    
+    char keypressed = myKeypad.getKey();
+      if (keypressed != NO_KEY){
     }
   }
 }
